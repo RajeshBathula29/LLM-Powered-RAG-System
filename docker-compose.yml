@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+
+  # ── RAG API ─────────────────────────────────────────────────────────────────
+  rag-api:
+    build: .
+    container_name: rag_api
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - PORT=5000
+    volumes:
+      - vectorstore_data:/app/vectorstore
+      - ./data:/app/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - rag_net
+
+  # ── Ollama (LLaMA runner) ────────────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - rag_net
+    # Pull LLaMA 3 on first start
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull llama3 && wait"]
+
+  # ── Prometheus (metrics scraping) ────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: unless-stopped
+    networks:
+      - rag_net
+
+  # ── Grafana (dashboard UI) ───────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - rag_net
+
+volumes:
+  vectorstore_data:
+  ollama_data:
+  grafana_data:
+
+networks:
+  rag_net:
+    driver: bridge

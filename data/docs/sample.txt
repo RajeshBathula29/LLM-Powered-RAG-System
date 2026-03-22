@@ -1,0 +1,17 @@
+Artificial Intelligence Overview
+
+Machine learning is a subset of artificial intelligence that gives systems the ability
+to automatically learn and improve from experience without being explicitly programmed.
+
+Deep learning is a subset of machine learning based on artificial neural networks with
+multiple layers. It powers modern applications like image recognition, NLP, and more.
+
+Retrieval-Augmented Generation (RAG) is a technique that combines a retrieval system
+(fetching relevant documents) with a generative model (producing fluent answers).
+This significantly reduces hallucinations compared to pure generation.
+
+FAISS (Facebook AI Similarity Search) is a library for efficient similarity search
+and clustering of dense vectors. It is widely used in production RAG pipelines.
+
+LangChain is an open-source framework that simplifies building LLM-powered applications
+by providing abstractions for chains, memory, agents, and document loaders.

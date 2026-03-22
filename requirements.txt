@@ -1,0 +1,21 @@
+# Core RAG stack
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-openai==0.1.23
+faiss-cpu==1.8.0
+openai==1.40.0
+
+# Document loaders
+pypdf==4.3.1
+unstructured==0.15.0
+
+# API server
+flask==3.0.3
+gunicorn==22.0.0
+
+# Monitoring
+prometheus-flask-exporter==0.23.1
+
+# Utilities
+python-dotenv==1.0.1
+tiktoken==0.7.0
